@@ -1,26 +1,26 @@
 [
 {
-  "directory": "/home/jam/Temp/sched/build",
-  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/jam/Temp/sched/src/main.cpp",
-  "file": "/home/jam/Temp/sched/src/main.cpp",
+  "directory": "/home/james/Projects/schedMaker/build",
+  "command": "/usr/sbin/c++  -I/home/james/Projects/schedMaker/include  -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/james/Projects/schedMaker/src/main.cpp",
+  "file": "/home/james/Projects/schedMaker/src/main.cpp",
   "output": "CMakeFiles/exec.dir/src/main.cpp.o"
 },
 {
-  "directory": "/home/jam/Temp/sched/build",
-  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/objects.cpp.o -c /home/jam/Temp/sched/src/objects.cpp",
-  "file": "/home/jam/Temp/sched/src/objects.cpp",
+  "directory": "/home/james/Projects/schedMaker/build",
+  "command": "/usr/sbin/c++  -I/home/james/Projects/schedMaker/include  -o CMakeFiles/exec.dir/src/objects.cpp.o -c /home/james/Projects/schedMaker/src/objects.cpp",
+  "file": "/home/james/Projects/schedMaker/src/objects.cpp",
   "output": "CMakeFiles/exec.dir/src/objects.cpp.o"
 },
 {
-  "directory": "/home/jam/Temp/sched/build",
-  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/renderer.cpp.o -c /home/jam/Temp/sched/src/renderer.cpp",
-  "file": "/home/jam/Temp/sched/src/renderer.cpp",
+  "directory": "/home/james/Projects/schedMaker/build",
+  "command": "/usr/sbin/c++  -I/home/james/Projects/schedMaker/include  -o CMakeFiles/exec.dir/src/renderer.cpp.o -c /home/james/Projects/schedMaker/src/renderer.cpp",
+  "file": "/home/james/Projects/schedMaker/src/renderer.cpp",
   "output": "CMakeFiles/exec.dir/src/renderer.cpp.o"
 },
 {
-  "directory": "/home/jam/Temp/sched/build",
-  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/scheduler.cpp.o -c /home/jam/Temp/sched/src/scheduler.cpp",
-  "file": "/home/jam/Temp/sched/src/scheduler.cpp",
+  "directory": "/home/james/Projects/schedMaker/build",
+  "command": "/usr/sbin/c++  -I/home/james/Projects/schedMaker/include  -o CMakeFiles/exec.dir/src/scheduler.cpp.o -c /home/james/Projects/schedMaker/src/scheduler.cpp",
+  "file": "/home/james/Projects/schedMaker/src/scheduler.cpp",
   "output": "CMakeFiles/exec.dir/src/scheduler.cpp.o"
 }
 ]

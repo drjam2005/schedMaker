@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/exec.dir/src/main.cpp.o CMakeFiles/exec.dir/src/objects.cpp.o CMakeFiles/exec.dir/src/renderer.cpp.o CMakeFiles/exec.dir/src/scheduler.cpp.o -o exec   -L/home/jam/Temp/sched/lib  -Wl,-rpath,/home/jam/Temp/sched/lib -lraylib 
+/usr/sbin/c++ -Wl,--dependency-file=CMakeFiles/exec.dir/link.d CMakeFiles/exec.dir/src/main.cpp.o CMakeFiles/exec.dir/src/objects.cpp.o CMakeFiles/exec.dir/src/renderer.cpp.o CMakeFiles/exec.dir/src/scheduler.cpp.o -o exec   -L/home/james/Projects/schedMaker/lib  -Wl,-rpath,/home/james/Projects/schedMaker/lib -lraylib
