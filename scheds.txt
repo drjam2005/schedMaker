@@ -93,7 +93,7 @@ SUBJ: PFIT104
 SUBJ: PHIS102
   PROF: M. Deduque
     N2Am
-      MW 10:30 15:00 IGN
+      MW 10:30 12:00 IGN
     
     N3Am
       MW 15:00 16:30 IGN
@@ -112,3 +112,12 @@ SUBJ: PHIS102
     
     N18Am
       TTH 15:00 16:30 IGN
+SUBJ: CSEC306
+  PROF: M.L. Perez
+    N1Am
+      MW 9:00 10:30 IGN
+  
+    N2Am
+      TTH 9:00 10:30 IGN
+
+

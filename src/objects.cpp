@@ -8,7 +8,7 @@ int schedule::end_to_min() const {
     return (60 * end_hour) + end_min;
 }
 
-bool schedule::isColliding(schedule& other) {
+bool schedule::isColliding(const schedule& other) const {
     bool shareDay = false;
     for(char c : days){
         if(other.days.find(c) != std::string::npos){

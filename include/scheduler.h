@@ -17,6 +17,14 @@ public:
 
     Scheduler(std::string filePath);
 
+	bool backtrackSchedule(
+		const std::vector<subject>& subjects,
+		size_t index,
+		std::vector<schedule>& temp,
+		std::vector<schedule>& result);
+	bool violatesThreeConsecutive(const std::vector<schedule>& schedules);
+
+
     void addSubject(subject subj);
     void addGap(const std::string& day, int start_min, int end_min);
     void parseFile();

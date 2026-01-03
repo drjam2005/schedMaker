@@ -226,5 +226,19 @@ void Renderer::Render() {
         DrawRectangleRec({x - 20, y - 10, static_cast<float>(textWidth + 40), static_cast<float>(fontSize + 20)}, Fade(BLACK, 0.5f));
         DrawText(msg.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, RED);
     }
+
+	// TIME LABELS (left side)
+	for(int r = 0; r < rows; ++r){
+		int minute = 450 + r * 30; // Start time = 7:30 AM
+		int hour = minute / 60;
+		int min  = minute % 60;
+
+		char buf[16];
+		sprintf(buf, "%d:%02d", hour, min);
+
+		float yPos = yOffset + r * gapY + gapY/2 - 6;
+		DrawText(buf, xOffset - 55, yPos, 16, WHITE);
+	}
+
 }
 

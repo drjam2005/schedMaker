@@ -18,7 +18,7 @@ struct schedule {
 	int start_to_min() const;
 	int end_to_min() const;
 
-	bool isColliding(schedule& other);
+	bool isColliding(const schedule& other) const;
 };
 
 struct Gap {
