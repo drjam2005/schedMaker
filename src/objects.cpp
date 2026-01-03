@@ -9,15 +9,27 @@ int schedule::end_to_min() const {
 }
 
 bool schedule::isColliding(const schedule& other) const {
+    // We need access to the mapping logic.
+    // If we can't easily pass the map, we check for exact substring matches
+    // or use a helper that handles "T" vs "TH" correctly.
+
+    auto getDays = [](std::string dstr) -> std::vector<std::string> {
+        if (dstr == "MW") return {"M", "W"};
+        if (dstr == "TTH") return {"T", "TH"};
+        return {dstr};
+    };
+
+    std::vector<std::string> myDays = getDays(days);
+    std::vector<std::string> theirDays = getDays(other.days);
+
     bool shareDay = false;
-    for(char c : days){
-        if(other.days.find(c) != std::string::npos){
-            shareDay = true;
-            break;
+    for (const auto& d1 : myDays) {
+        for (const auto& d2 : theirDays) {
+            if (d1 == d2) { shareDay = true; break; }
         }
     }
-    if(!shareDay)
-        return false;
+
+    if (!shareDay) return false;
 
     int s1 = start_to_min();
     int e1 = end_to_min();

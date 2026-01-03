@@ -65,7 +65,7 @@ SUBJ: NSTP102
       TTH 10:30 12:00 IGN
     
     RR22Am
-      THU 13:30 16:30 IGN
+      TH 13:30 16:30 IGN
     
     
 SUBJ: PFIT104
@@ -120,4 +120,15 @@ SUBJ: CSEC306
     N2Am
       TTH 9:00 10:30 IGN
 
+SUBJ: CRCP202
+  PROF: TBA
+    N10Af
+	  MW 9:00 10:30 A116
+
+    N11Af
+	  MW 9:00 10:30 A211
+	
+	N13Af
+	  MW 10:30 12:00 TBA
+	
 
