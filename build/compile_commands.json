@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/home/jam/Temp/sched/build",
+  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/main.cpp.o -c /home/jam/Temp/sched/src/main.cpp",
+  "file": "/home/jam/Temp/sched/src/main.cpp",
+  "output": "CMakeFiles/exec.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/jam/Temp/sched/build",
+  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/objects.cpp.o -c /home/jam/Temp/sched/src/objects.cpp",
+  "file": "/home/jam/Temp/sched/src/objects.cpp",
+  "output": "CMakeFiles/exec.dir/src/objects.cpp.o"
+},
+{
+  "directory": "/home/jam/Temp/sched/build",
+  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/renderer.cpp.o -c /home/jam/Temp/sched/src/renderer.cpp",
+  "file": "/home/jam/Temp/sched/src/renderer.cpp",
+  "output": "CMakeFiles/exec.dir/src/renderer.cpp.o"
+},
+{
+  "directory": "/home/jam/Temp/sched/build",
+  "command": "/usr/bin/c++  -I/home/jam/Temp/sched/include  -o CMakeFiles/exec.dir/src/scheduler.cpp.o -c /home/jam/Temp/sched/src/scheduler.cpp",
+  "file": "/home/jam/Temp/sched/src/scheduler.cpp",
+  "output": "CMakeFiles/exec.dir/src/scheduler.cpp.o"
+}
+]
