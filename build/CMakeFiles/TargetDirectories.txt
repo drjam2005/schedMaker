@@ -1,3 +1,0 @@
-/home/james/Projects/schedMaker/build/CMakeFiles/exec.dir
-/home/james/Projects/schedMaker/build/CMakeFiles/edit_cache.dir
-/home/james/Projects/schedMaker/build/CMakeFiles/rebuild_cache.dir
