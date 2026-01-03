@@ -167,11 +167,11 @@ std::vector<subject> Scheduler::getSubjectsWithGaps(){
     return allSubjects;
 }
 
-bool Scheduler::violatesThreeConsecutive(const std::vector<schedule>& schedules) {
-    // Check each day M=0..SUN=6
-    for (int d = 0; d < 7; ++d) {
-        // Gather schedules for this day
+
+bool Scheduler::violatesConsecutive(const std::vector<schedule>& schedules) {
+    for (int d = 0; d < 7; ++d) { // M=0..SUN=6
         std::vector<schedule> daySchedules;
+
         for (const auto &s : schedules) {
             if (s.subject_code == "GAP") continue;
             auto days = scheduleDays(s.days, dayMap);
@@ -179,7 +179,8 @@ bool Scheduler::violatesThreeConsecutive(const std::vector<schedule>& schedules)
                 daySchedules.push_back(s);
         }
 
-        if(daySchedules.size() < 3) continue;
+        if(daySchedules.size() < static_cast<size_t>(maxConsecutiveSchedules))
+            continue;
 
         // Sort by start time
         std::sort(daySchedules.begin(), daySchedules.end(),
@@ -187,16 +188,21 @@ bool Scheduler::violatesThreeConsecutive(const std::vector<schedule>& schedules)
                       return a.start_to_min() < b.start_to_min();
                   });
 
-        // Check for 3 consecutive schedules with no gaps
-        for (size_t i = 0; i + 2 < daySchedules.size(); ++i) {
-            if (daySchedules[i].end_to_min() == daySchedules[i+1].start_to_min() &&
-                daySchedules[i+1].end_to_min() == daySchedules[i+2].start_to_min()) {
-                return true; // violates rule
+        // Check for consecutive schedules with no gaps
+        for (size_t i = 0; i + maxConsecutiveSchedules - 1 < daySchedules.size(); ++i) {
+            bool consecutive = true;
+            for (int j = 0; j < maxConsecutiveSchedules - 1; ++j) {
+                if (daySchedules[i + j].end_to_min() != daySchedules[i + j + 1].start_to_min()) {
+                    consecutive = false;
+                    break;
+                }
             }
+            if (consecutive) return true; // violates rule
         }
     }
     return false; // ok
 }
+
 
 bool Scheduler::backtrackSchedule(
     const std::vector<subject>& subs,
@@ -231,7 +237,7 @@ bool Scheduler::backtrackSchedule(
         placed.insert(placed.end(), sl.schedules.begin(), sl.schedules.end());
 
         // Check 3 consecutive schedules rule
-        if(violatesThreeConsecutive(placed)) {
+        if(violatesConsecutive(placed)) {
             placed.erase(placed.end() - sl.schedules.size(), placed.end());
             continue;
         }

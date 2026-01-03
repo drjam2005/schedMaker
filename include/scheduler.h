@@ -22,13 +22,15 @@ public:
 		size_t index,
 		std::vector<schedule>& temp,
 		std::vector<schedule>& result);
-	bool violatesThreeConsecutive(const std::vector<schedule>& schedules);
+	//bool violatesThreeConsecutive(const std::vector<schedule>& schedules);
+	bool violatesConsecutive(const std::vector<schedule>& schedules);
 
 
     void addSubject(subject subj);
     void addGap(const std::string& day, int start_min, int end_min);
     void parseFile();
 
+	int maxConsecutiveSchedules = 3;
     std::vector<subject> getSubjectsWithGaps();
     std::vector<schedule> generateSchedule();
 };
