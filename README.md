@@ -9,6 +9,17 @@ SUBJ: <subj-code>
       ...                                 // 6 spaces indentationes
       <date> <startTime> <endTime> <room> // 6 spaces indentationes
 ```
+- DATE FORMATS
+```
+MONDAY = MW
+TUESDAY = T
+WEDNESDAY = W
+THURSDAY = TH
+FRIDAY = F
+SATURDAY = SAT
+```
+
+
 
 example:
 ```
