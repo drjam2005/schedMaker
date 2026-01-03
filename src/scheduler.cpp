@@ -33,10 +33,18 @@ void Scheduler::addGap(const std::string& day, int start_min, int end_min){
 }
 
 // ---- Parse input file ----
-void Scheduler::parseFile(){
+void Scheduler::parseFile() {
     subjects.clear();
     std::ifstream file(filePath);
-    if(!file.is_open()){ std::cerr << "Failed to open: " << filePath << "\n"; return; }
+    if (!file.is_open()) {
+        std::cerr << "Failed to open: " << filePath << "\n";
+        return;
+    }
+
+    auto trim = [](std::string &s) {
+        s.erase(0, s.find_first_not_of(" \t"));
+        s.erase(s.find_last_not_of(" \t") + 1);
+    };
 
     std::string line;
     subject currSubj;
@@ -44,37 +52,52 @@ void Scheduler::parseFile(){
     std::string currProf;
     bool inSlot = false;
 
-    while(std::getline(file, line)){
-        if(line.empty()) continue;
-        line.erase(0, line.find_first_not_of(" \t"));
-        line.erase(line.find_last_not_of(" \t")+1);
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
 
-        if(line.rfind("SUBJ:",0)==0){
-            if(inSlot){ currSubj.slots.push_back(currSlot); inSlot=false; }
-            if(!currSubj.subject_code.empty()) subjects.push_back(currSubj);
+        // Count leading spaces
+        size_t indent = line.find_first_not_of(" ");
+        if (indent == std::string::npos) indent = 0; // empty or all spaces
+
+        std::string trimmed = line.substr(indent);
+        trim(trimmed);
+
+        if (indent == 0 && trimmed.rfind("SUBJ:", 0) == 0) {
+            if (trimmed.size() < 6) continue; // skip malformed line
+
+            if (inSlot) { currSubj.slots.push_back(currSlot); inSlot = false; }
+            if (!currSubj.subject_code.empty()) subjects.push_back(currSubj);
 
             currSubj = subject();
-            currSubj.subject_code = line.substr(5);
-            currSubj.subject_code.erase(0, currSubj.subject_code.find_first_not_of(" \t"));
+            currSubj.subject_code = trimmed.substr(5);
+            trim(currSubj.subject_code);
         }
-        else if(line.rfind("PROF:",0)==0){
-            currProf = line.substr(5);
-            currProf.erase(0, currProf.find_first_not_of(" \t"));
+        else if (indent == 2 && trimmed.rfind("PROF:", 0) == 0) {
+            if (trimmed.size() < 6) continue; // skip malformed
+
+            if (inSlot) { currSubj.slots.push_back(currSlot); inSlot = false; }
+
+            currProf = trimmed.substr(5);
+            trim(currProf);
         }
-        else if(line.find(' ') == std::string::npos){
-            if(inSlot) currSubj.slots.push_back(currSlot);
+        else if (indent == 4) {
+            // Section
+            if (inSlot) currSubj.slots.push_back(currSlot);
 
             currSlot = slot();
             currSlot.subject_code = currSubj.subject_code;
             currSlot.professor = currProf;
-            currSlot.section = line;
+            currSlot.section = trimmed;
             inSlot = true;
         }
-        else if(inSlot){
-            std::istringstream ss(line);
-            std::string days, startStr, endStr, room="IGN";
+        else if (indent == 6) {
+            // Schedule
+            if (!inSlot) continue;
+
+            std::istringstream ss(trimmed);
+            std::string days, startStr, endStr, room = "IGN";
             ss >> days >> startStr >> endStr;
-            if(ss >> room);
+            if (ss >> room); // optional
 
             schedule s;
             s.subject_code = currSubj.subject_code;
@@ -90,9 +113,11 @@ void Scheduler::parseFile(){
         }
     }
 
-    if(inSlot) currSubj.slots.push_back(currSlot);
-    if(!currSubj.subject_code.empty()) subjects.push_back(currSubj);
+    if (inSlot) currSubj.slots.push_back(currSlot);
+    if (!currSubj.subject_code.empty()) subjects.push_back(currSubj);
 }
+
+
 
 // ---- Helper: get indices for schedule days ----
 static std::vector<int> scheduleDays(const std::string& dayStr, const std::unordered_map<std::string,std::vector<int>>& dayMap){
