@@ -1,6 +1,13 @@
 // sample scheds
 // you can use // to comment out
 
+// format
+// SUBJ: subject_code
+// // PROF: the professor that teaches said subject
+// // // SectionN <- the section/s they handle for said subject
+// // // // DT HS:MS HE:ME room <- (Date, HourStart:MinuteStart HourEnd:MinuteEnd, Room)
+// (note that indentation is optional)
+
 SUBJ: Subject1
   PROF: Professor1
     Section1
