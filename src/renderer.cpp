@@ -130,7 +130,7 @@ void Renderer::Update() {
         if(CheckCollisionPointRec(mouse, {x, y, w, h}) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             GapVisual g;
             g.day = days[i];
-            g.startRow = rows - 4;
+            g.startRow = rows - 2;
             g.endRow = rows;
             gapVisuals.push_back(g);
         }

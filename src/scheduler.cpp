@@ -257,16 +257,12 @@ std::vector<schedule> Scheduler::generateSchedule() {
     auto allSubs = getSubjectsWithGaps();
     std::sort(allSubs.begin(), allSubs.end());
 
-	bool foundNSTP = false;
-    for(auto &s : allSubs) if(s.subject_code == "NSTP102") foundNSTP = true;
-    if(!foundNSTP) std::cout << "NSTP missing from subjects list before backtracking!" << std::endl;
-
     std::vector<schedule> placed;
     std::vector<schedule> finalSched;
     if(backtrackSchedule(allSubs, 0, placed, finalSched))
         return finalSched;
 
-    return {}; // no valid schedule found
+    return {};
 }
 
 

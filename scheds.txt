@@ -1,134 +1,20 @@
-SUBJ: CSDC105
-  PROF: M.T. Aguilar
-    ZC21Am
+// sample scheds
+// you can use // to comment out
+
+SUBJ: Subject1
+  PROF: Professor1
+    Section1
       MW 9:00 10:30 IGN
       TTH 9:00 10:00 IGN
     
-    ZC22Am
+    Section2
       MW 10:30 12:00 IGN
       TTH 10:00 11:00 IGN
     
-    ZS21Am
-      MW 15:00 16:30 IGN
-      TTH 11:00 12:00 IGN
-    
-  PROF: K.G. Tapel
-    ZT21Am
-      MW 18:00 19:00 IGN
-      TTH 16:30 18:00 IGN
-    
-    ZT22Am
-      MW 19:00 20:00 IGN
-      TTH 15:00 16:30 IGN
-    
-    ZT23Am
-      MW 20:00 21:00 IGN
-      TTH 12:00 13:30 IGN
-    
-    
-SUBJ: CSMC221
-  PROF: J. Aureus
-    ZC21Am
+SUBJ: Subject2
+  PROF: Professor2
+    Section3
       TTH 13:30 15:00 IGN
     
-    ZC22Am
+    Section4
       TTH 15:00 16:30 IGN
-    
-    
-SUBJ: CSMC222
-  PROF: M.Z. Imperial
-    ZC21Am
-      MW 18:00 19:30 IGN
-    
-    ZC22Am
-      MW 19:30 21:00 IGN
-    
-    
-SUBJ: CSMC223
-  PROF: M.L. Perez
-    ZC21Am
-      TTH 12:00 13:30 IGN
-    
-    ZC22Am
-      TTH 13:30 15:00 IGN
-    
-    
-SUBJ: NSTP102
-  PROF: J.R. SeÑora
-    N19Am
-      MW 10:30 12:00 IGN
-    
-    N23Am
-      FRI 8:00 11:00 IGN
-    
-    N30Am
-      TTH 10:30 12:00 IGN
-    
-    RR22Am
-      TH 13:30 16:30 IGN
-    
-    
-SUBJ: PFIT104
-  PROF: H. Valle
-    N47FAf
-      SAT 10:00 12:00 IGN
-    
-    N47MAf
-      SAT 8:00 10:00 IGN
-    
-    N48FAf
-      SAT 15:00 17:00 IGN
-    
-    N48MAf
-      SAT 13:00 15:00 IGN
-    
-  PROF: TBA
-    RR24Af
-      SAT 10:00 12:00 IGN
-    
-    RR25Af
-      SAT 8:00 10:00 IGN
-    
-    
-SUBJ: PHIS102
-  PROF: M. Deduque
-    N2Am
-      MW 10:30 12:00 IGN
-    
-    N3Am
-      MW 15:00 16:30 IGN
-    
-    RRM22Am
-      TTH 10:30 12:00 IGN
-    
-    N14Am
-      MW 10:30 12:00 IGN
-    
-    N15Am
-      TTH 9:00 10:30 IGN
-    
-    N17Am
-      TTH 13:30 15:00 IGN
-    
-    N18Am
-      TTH 15:00 16:30 IGN
-SUBJ: CSEC306
-  PROF: M.L. Perez
-    N1Am
-      MW 9:00 10:30 IGN
-  
-    N2Am
-      TTH 9:00 10:30 IGN
-
-SUBJ: CRCP202
-  PROF: TBA
-    N10Af
-	  MW 9:00 10:30 A116
-
-    N11Af
-	  MW 9:00 10:30 A211
-	
-	N13Af
-	  MW 10:30 12:00 TBA
-	
-
