@@ -1,6 +1,5 @@
 #include "scheduler.h"
 #include <raylib.h>
-#include <iostream>
 #include <gui.h>
 #include <renderer.h>
 
@@ -16,7 +15,7 @@ int main(){
 
 	while(!WindowShouldClose()){
 		renderer.Update();
-		renderer.SyncGapsToScheduler(scheduler);  // <-- sync first
+		renderer.SyncGapsToScheduler(scheduler);
 		renderer.scheduleToRender = scheduler.generateSchedule();
 
 		BeginDrawing();

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <cmath>
 
+
 Renderer::Renderer() {
     // Day mappings
     umap["M"]   = {0}; umap["T"] = {1}; umap["W"] = {2};
@@ -45,7 +46,7 @@ void Renderer::SyncGapsToScheduler(Scheduler& scheduler) {
 Color Renderer::getSubjectColor(const std::string& subj) {
     if(subjectColors.find(subj) != subjectColors.end()) return subjectColors[subj];
 
-    size_t hash = std::hash<std::string>{}(subj+":3");
+    size_t hash = std::hash<std::string>{}(subj+":69");
     Color c = {
         static_cast<unsigned char>((hash & 0xFF0000) >> 16),
         static_cast<unsigned char>((hash & 0x00FF00) >> 8),
@@ -159,31 +160,40 @@ void Renderer::Render() {
     // Grid
     for(int i = 0; i < cols; ++i){
         for(int j = 0; j < rows; ++j){
-            DrawRectangle(xOffset + i*gapX + 1, yOffset + j*gapY + 1, gapX - 2, gapY - 2, DARKGRAY);
+            DrawRectangle(xOffset + i*gapX + 1, yOffset + j*gapY + 1, gapX, gapY, DARKGRAY);
         }
     }
 
     // Grid lines
-    for(int i = 0; i <= cols; ++i) DrawRectangle(xOffset + i*gapX, yOffset, 2, tableHeight, WHITE);
-    for(int j = 0; j <= rows; ++j) DrawRectangle(xOffset, yOffset + j*gapY, tableWidth, 2, WHITE);
+    for(int i = 0; i <= cols; ++i) DrawRectangle(xOffset + i*gapX, yOffset, 1, tableHeight, WHITE);
+    for(int j = 0; j <= rows; ++j) {
+		Color clr = ColorBrightness(GRAY, 0.25f);
+		if(j == 9) clr = WHITE;
+		DrawRectangle(xOffset, yOffset + j*gapY, tableWidth, (j % 2 ? 2 : 1), clr);
+	}
 
     // Day labels
     for(int i = 0; i < cols; ++i){
-        DrawText(days[i].c_str(), xOffset + i*gapX + gapX/2 - 20, yOffset - 25, 20, WHITE);
+        DrawTextEx(boldFont, days[i].c_str(), {xOffset + i*gapX + gapX/2 - 20, yOffset - 25}, 25, 5, WHITE);
     }
 
     // Schedules
     for(auto &s : scheduleToRender){
         if(s.subject_code == "GAP") continue;
-        Color subjColor = getSubjectColor(s.subject_code);
+        Color subjColor = ColorBrightness(ColorContrast(getSubjectColor(s.subject_code), -0.1f), 0.2f);
 
         for(int dayIdx : umap[s.days]){
             float yPos = yOffset + ((s.start_to_min() - 450)/30.0f) * gapY;
             float height = ((s.end_to_min() - s.start_to_min())/30.0f) * gapY;
             float x = xOffset + dayIdx*gapX;
-            DrawRectangle(x, yPos, gapX, height, subjColor);
-            DrawText(s.subject_code.c_str(), x + 5, yPos + 5, 12, BLACK);
-            DrawText(s.section.c_str(), x + 5, yPos + 17, 12, BLACK);
+			Rectangle rec = {x+3, yPos+3, gapX-6.0f, height-6.0f};
+			float roundness = 0.3f;
+			DrawRectangleRounded(rec, roundness, 10, subjColor);
+			DrawRectangleRoundedLinesEx(rec, roundness, 10, 2, ColorBrightness(DARKGRAY, -0.5f));
+            DrawTextEx(boldFont, s.subject_code.c_str(), {x + 5, yPos + 7}, 20, 1, BLACK);
+            DrawTextEx(boldFont, s.section.c_str(),      {x + 5, yPos + 20}, 20, 1, BLACK);
+			Vector2 profDims = MeasureTextEx(boldFont, s.professor.c_str(), 20, 1);
+            DrawTextEx(boldFont, s.professor.c_str(),    {x + rec.width - profDims.x - 5, yPos + height - 20}, 20, 1, BLACK);
         }
     }
 
@@ -195,10 +205,10 @@ void Renderer::Render() {
             float pixelEnd   = yOffset + g.endRow * gapY;
             float height = pixelEnd - pixelStart;
 
-            DrawRectangle(x, pixelStart, gapX, height, Fade(RED, 0.5f));
-            DrawRectangleLines(x, pixelStart, gapX, height, RED);
-            DrawRectangle(x, pixelStart - 3, gapX, 6, RED);
-            DrawRectangle(x, pixelEnd - 3, gapX, 6, RED);
+            DrawRectangle(x, pixelStart, gapX, height, Fade(RED, 0.2f));
+            DrawRectangleLines(x, pixelStart, gapX, height, Fade(RED, 1.0f));
+            DrawRectangle(x, pixelStart - 3, gapX, 6,       Fade(RED, 0.5f));
+            DrawRectangle(x, pixelEnd - 3, gapX, 6,         Fade(RED, 0.5f));
         }
     }
 
@@ -207,14 +217,16 @@ void Renderer::Render() {
         float x = xOffset + i*gapX;
         float y = yOffset + tableHeight + 10;
         DrawRectangle(x, y, gapX, 20, DARKGRAY);
-        DrawText("Add Gap", x + 5, y + 2, 14, WHITE);
+		//DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
+        DrawTextEx(boldFont, "Add Gap", {x + 5, y + 2}, 14, 1, WHITE);
     }
 
     // Clear All button
     float clearX = xOffset + tableWidth - 100;
     float clearY = yOffset + tableHeight + 10;
     DrawRectangle(clearX, clearY, 90, 20, DARKGRAY);
-    DrawText("Clear All", clearX + 5, clearY + 2, 14, WHITE);
+	//DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
+    DrawTextEx(boldFont, "Clear All", {clearX + 5, clearY + 2}, 14, 5, WHITE);
 
     // No schedules message
     if(scheduleToRender.empty()){
@@ -224,21 +236,22 @@ void Renderer::Render() {
         float x = xOffset + tableWidth/2.0f - textWidth/2.0f;
         float y = yOffset + tableHeight/2.0f - fontSize/2.0f;
         DrawRectangleRec({x - 20, y - 10, static_cast<float>(textWidth + 40), static_cast<float>(fontSize + 20)}, Fade(BLACK, 0.5f));
-        DrawText(msg.c_str(), static_cast<int>(x), static_cast<int>(y), fontSize, RED);
+		//DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
+        DrawTextEx(boldFont, msg.c_str(), {static_cast<float>(x), static_cast<float>(y)}, fontSize, 1, RED);
     }
 
 	// TIME LABELS (left side)
-	for(int r = 0; r < rows; ++r){
+	for(int r = 0; r < rows+1; ++r){
 		int minute = 450 + r * 30; // Start time = 7:30 AM
 		int hour = minute / 60;
 		int min  = minute % 60;
 
 		char buf[16];
-		sprintf(buf, "%d:%02d", hour, min);
+		sprintf(buf, "%d:%02d-", hour, min);
 
-		float yPos = yOffset + r * gapY + gapY/2 - 6;
-		DrawText(buf, xOffset - 55, yPos, 16, WHITE);
+		float yPos = yOffset + r * gapY + gapY/2 - 20;
+		//DrawTextEx(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint); // Draw text using font and additional parameters
+		DrawTextEx(boldFont, buf, {xOffset - 55, yPos}, 20, 1, WHITE);
 	}
-
 }
 
