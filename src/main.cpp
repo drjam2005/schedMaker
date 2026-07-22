@@ -7,11 +7,12 @@
 #define HEIGHT 768
 
 int main(){
+	SetTraceLogLevel(LOG_NONE);
 	InitWindow(WIDTH, HEIGHT, "Overkill Scheduler");
 	SetTargetFPS(60);
 
 	Renderer renderer;
-	Scheduler scheduler("../scheds.txt");
+	Scheduler scheduler("./scheds.txt");
 
 	while(!WindowShouldClose()){
 		renderer.Update();

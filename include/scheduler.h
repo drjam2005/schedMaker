@@ -31,6 +31,8 @@ public:
 	const int maxConsecutiveSchedules = 3;
     std::vector<subject> getSubjectsWithGaps();
     std::vector<schedule> generateSchedule();
+
+	void ensureScheduleFileExists();
 };
 
 #endif

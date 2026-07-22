@@ -1,10 +1,12 @@
 #include "scheduler.h"
+#include "defaultSched.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <ctime>
+#include <raylib.h>
 
 void parseTime(const std::string& timeStr, int &hour, int &min) {
     size_t pos = timeStr.find(':');
@@ -17,6 +19,7 @@ void parseTime(const std::string& timeStr, int &hour, int &min) {
 
 Scheduler::Scheduler(std::string filePath) {
     this->filePath = filePath;
+	ensureScheduleFileExists();
     dayNames = {"M","T","W","TH","FRI","SAT","SUN"};
     dayMap = {
         {"M",{0}}, {"T",{1}}, {"W",{2}}, {"TH",{3}}, {"FRI",{4}}, {"SAT",{5}}, {"SUN",{6}},
@@ -43,10 +46,16 @@ static inline std::string trim(const std::string& s) {
 void Scheduler::parseFile() {
     subjects.clear();
     std::ifstream file(filePath);
-    if (!file.is_open()) {
+
+	std::istream* input = nullptr;
+
+	if(!FileExists(filePath.c_str())) {
+		std::cerr << TextFormat("%s doesn't exist", filePath.c_str()) << '\n';
+	}
+
+    if (!file.is_open())  {
         std::cerr << "Failed to open: " << filePath << "\n";
-        return;
-    }
+	}
 
     std::string line;
     subject currSubj;
@@ -269,4 +278,18 @@ std::vector<schedule> Scheduler::generateSchedule() {
 
 
 
+void Scheduler::ensureScheduleFileExists()
+{
+	if (FileExists(filePath.c_str()))
+		return;
 
+	std::ofstream out(filePath);
+	if (!out) {
+		std::cerr << "Failed to create " << filePath << '\n';
+		return;
+	}
+
+	out << defaultSched;
+
+	std::cout << "Created default schedule: " << filePath << '\n';
+}
