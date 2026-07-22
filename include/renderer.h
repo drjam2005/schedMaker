@@ -2,6 +2,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 #include <raylib.h>
+#include "font.h"
 #include <scheduler.h>
 
 #include <unordered_map>
@@ -22,6 +23,8 @@ struct GapVisual {
 
 
 class Renderer {
+	Font boldFont = LoadFontFromMemory(".ttf", fontBold, (int)(fontBold_len), 50, nullptr, 0);
+	Font regFont = LoadFontFromMemory(".ttf", fontReg, (int)(fontReg_len), 50, nullptr, 0);
 public:
     Renderer();
 
@@ -50,7 +53,6 @@ private:
 
     Color getSubjectColor(const std::string& subj);
 };
-
 
 
 #endif
