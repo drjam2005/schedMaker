@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(scheduler)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(exec exec)
+set(exec Scheduler)
 set(src
 	src/main.cpp
 	src/objects.cpp

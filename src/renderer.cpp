@@ -5,6 +5,114 @@
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include <cctype>
+
+namespace {
+
+std::string trim(const std::string& value) {
+    const size_t first = value.find_first_not_of(" \t\r\n");
+    if (first == std::string::npos) return "";
+    const size_t last = value.find_last_not_of(" \t\r\n");
+    return value.substr(first, last - first + 1);
+}
+
+std::string lowercase(const std::string& value) {
+    std::string result = value;
+    for (char& character : result) {
+        character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+    }
+    return result;
+}
+
+std::string lettersAndDigits(const std::string& value) {
+    std::string result;
+    for (unsigned char character : value) {
+        if (std::isalnum(character)) result += static_cast<char>(character);
+    }
+    return result;
+}
+
+struct ProfessorName {
+    std::string lastName;
+    std::string givenNames;
+};
+
+ProfessorName splitProfessorName(const std::string& fullName) {
+    const std::string name = trim(fullName);
+    const size_t comma = name.find(',');
+    if (comma != std::string::npos) {
+        return {trim(name.substr(0, comma)), trim(name.substr(comma + 1))};
+    }
+
+    const size_t lastSpace = name.find_last_of(" \t");
+    if (lastSpace == std::string::npos) return {name, ""};
+    return {trim(name.substr(lastSpace + 1)), trim(name.substr(0, lastSpace))};
+}
+
+std::unordered_map<std::string, std::string> professorLabels(
+    const std::vector<schedule>& schedules) {
+    std::unordered_map<std::string, ProfessorName> names;
+    std::unordered_map<std::string, std::vector<std::string>> namesByLastName;
+
+    for (const schedule& schedule : schedules) {
+        if (schedule.subject_code == "GAP" || schedule.professor.empty() ||
+            names.find(schedule.professor) != names.end()) {
+            continue;
+        }
+
+        ProfessorName name = splitProfessorName(schedule.professor);
+        const std::string lastNameKey = lowercase(name.lastName);
+        names.emplace(schedule.professor, name);
+        namesByLastName[lastNameKey].push_back(schedule.professor);
+    }
+
+    std::unordered_map<std::string, std::string> labels;
+    for (const auto& [lastName, professors] : namesByLastName) {
+        if (professors.size() == 1) {
+            labels[professors.front()] = names.at(professors.front()).lastName;
+            continue;
+        }
+
+        // Professors sharing a surname get the shortest leading portion of
+        // their given names that makes their schedule labels distinct.
+        for (const std::string& professor : professors) {
+            const ProfessorName& name = names.at(professor);
+            const std::string givenDisplay = lettersAndDigits(name.givenNames);
+            const std::string givenKey = lowercase(givenDisplay);
+            std::string distinguishingPrefix;
+
+            for (size_t length = 1; length <= givenKey.size(); ++length) {
+                const std::string candidate = givenKey.substr(0, length);
+                bool unique = true;
+                for (const std::string& otherProfessor : professors) {
+                    if (otherProfessor == professor) continue;
+                    const std::string otherGiven = lowercase(
+                        lettersAndDigits(names.at(otherProfessor).givenNames));
+                    if (otherGiven.substr(0, length) == candidate) {
+                        unique = false;
+                        break;
+                    }
+                }
+                if (unique) {
+                    distinguishingPrefix = givenDisplay.substr(0, length);
+                    break;
+                }
+            }
+
+            if (distinguishingPrefix.empty()) {
+                // Identical or incomplete names cannot be shortened without
+                // losing the only available distinction.
+                labels[professor] = professor;
+            } else {
+                labels[professor] = distinguishingPrefix + ". " + name.lastName;
+            }
+        }
+    }
+
+    return labels;
+}
+
+} // namespace
 
 
 Renderer::Renderer() {
@@ -177,6 +285,8 @@ void Renderer::Render() {
         DrawTextEx(boldFont, days[i].c_str(), {xOffset + i*gapX + gapX/2 - 20, yOffset - 25}, 25, 5, WHITE);
     }
 
+    const auto professorLabelsToRender = professorLabels(scheduleToRender);
+
     // Schedules
     for(auto &s : scheduleToRender){
         if(s.subject_code == "GAP") continue;
@@ -192,8 +302,12 @@ void Renderer::Render() {
 			DrawRectangleRoundedLinesEx(rec, roundness, 10, 2, ColorBrightness(DARKGRAY, -0.5f));
             DrawTextEx(boldFont, s.subject_code.c_str(), {x + 5, yPos + 7}, 20, 1, BLACK);
             DrawTextEx(boldFont, s.section.c_str(),      {x + 5, yPos + 20}, 20, 1, BLACK);
-			Vector2 profDims = MeasureTextEx(boldFont, s.professor.c_str(), 20, 1);
-            DrawTextEx(boldFont, s.professor.c_str(),    {x + rec.width - profDims.x - 5, yPos + height - 20}, 20, 1, BLACK);
+            const auto professorLabel = professorLabelsToRender.find(s.professor);
+            const std::string& professor = professorLabel == professorLabelsToRender.end()
+                ? s.professor
+                : professorLabel->second;
+			Vector2 profDims = MeasureTextEx(boldFont, professor.c_str(), 20, 1);
+            DrawTextEx(boldFont, professor.c_str(),      {x + rec.width - profDims.x - 5, yPos + height - 20}, 20, 1, BLACK);
         }
     }
 
@@ -254,4 +368,3 @@ void Renderer::Render() {
 		DrawTextEx(boldFont, buf, {xOffset - 55, yPos}, 20, 1, WHITE);
 	}
 }
-

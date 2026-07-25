@@ -5,15 +5,30 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 #include <ctime>
 #include <raylib.h>
 
+static inline std::string trim(const std::string& s);
+
 void parseTime(const std::string& timeStr, int &hour, int &min) {
-    size_t pos = timeStr.find(':');
+    std::string value = trim(timeStr);
+    std::transform(value.begin(), value.end(), value.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+
+    size_t pos = value.find(':');
     if (pos == std::string::npos) { hour = min = 0; return; }
+
     try {
-        hour = std::stoi(timeStr.substr(0, pos));
-        min = std::stoi(timeStr.substr(pos + 1));
+        hour = std::stoi(value.substr(0, pos));
+        min = std::stoi(value.substr(pos + 1, 2));
+
+        const bool isAM = value.find("AM", pos + 1) != std::string::npos;
+        const bool isPM = value.find("PM", pos + 1) != std::string::npos;
+        const bool isNoon = value.find("NN", pos + 1) != std::string::npos;
+        if (isAM && hour == 12) hour = 0;
+        if (isPM && hour != 12) hour += 12;
+        if (isNoon) hour = 12;
     } catch(...) { hour = min = 0; }
 }
 
@@ -42,12 +57,82 @@ static inline std::string trim(const std::string& s) {
     return s.substr(start, end - start + 1);
 }
 
-// ---- Parse input file ----
+static std::vector<std::string> splitTabFields(const std::string& line) {
+    std::vector<std::string> fields;
+    std::stringstream stream(line);
+    std::string field;
+
+    while (std::getline(stream, field, '\t')) fields.push_back(trim(field));
+    return fields;
+}
+
+static bool parseMeeting(const std::string& value, schedule& result) {
+    std::istringstream stream(value);
+    std::string start, separator, end;
+    if (!(stream >> result.days >> start >> separator >> end) || separator != "-") return false;
+
+    parseTime(start, result.start_hour, result.start_min);
+    parseTime(end, result.end_hour, result.end_min);
+    return true;
+}
+
+static bool isClosedRow(const std::vector<std::string>& fields) {
+    if (fields.empty()) return false;
+
+    std::string availability = fields.back();
+    std::transform(availability.begin(), availability.end(), availability.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+    return availability == "CLOSED";
+}
+
+static void addTabularSchedule(std::vector<subject>& subjects,
+                               const std::string& subjectCode,
+                               const std::string& section,
+                               const schedule& meeting) {
+    auto subjectIt = std::find_if(subjects.begin(), subjects.end(),
+        [&](const subject& value) { return value.subject_code == subjectCode; });
+    if (subjectIt == subjects.end()) {
+        subjects.push_back(subject());
+        subjectIt = std::prev(subjects.end());
+        subjectIt->subject_code = subjectCode;
+    }
+
+    auto slotIt = std::find_if(subjectIt->slots.begin(), subjectIt->slots.end(),
+        [&](const slot& value) {
+            // A registrar row describes one meeting of a section.  A section
+            // may have several rows (for example, separate lecture and lab
+            // meetings), so its section name—not the per-row instructor
+            // text—is the offering identity.
+            return value.section == section;
+        });
+    if (slotIt == subjectIt->slots.end()) {
+        subjectIt->slots.push_back(slot());
+        slotIt = std::prev(subjectIt->slots.end());
+        slotIt->subject_code = subjectCode;
+        slotIt->section = section;
+        slotIt->professor = meeting.professor;
+    }
+
+    // Ignore an exact duplicate while retaining distinct meetings for the
+    // same section.  This makes an accidental duplicate export harmless.
+    const auto duplicate = std::find_if(slotIt->schedules.begin(), slotIt->schedules.end(),
+        [&](const schedule& value) {
+            return value.days == meeting.days &&
+                   value.start_hour == meeting.start_hour &&
+                   value.start_min == meeting.start_min &&
+                   value.end_hour == meeting.end_hour &&
+                   value.end_min == meeting.end_min &&
+                   value.room == meeting.room;
+        });
+    if (duplicate == slotIt->schedules.end()) {
+        slotIt->schedules.push_back(meeting);
+    }
+}
+
+// ---- Parse registrar-exported tab-separated rows ----
 void Scheduler::parseFile() {
     subjects.clear();
     std::ifstream file(filePath);
-
-	std::istream* input = nullptr;
 
 	if(!FileExists(filePath.c_str())) {
 		std::cerr << TextFormat("%s doesn't exist", filePath.c_str()) << '\n';
@@ -58,72 +143,23 @@ void Scheduler::parseFile() {
 	}
 
     std::string line;
-    subject currSubj;
-    slot currSlot;
-    std::string currProf;
-    bool inSlot = false;
-
-    auto trim = [](std::string &s) {
-        s.erase(0, s.find_first_not_of(" \t"));
-        s.erase(s.find_last_not_of(" \t") + 1);
-    };
-
     while (std::getline(file, line)) {
-        trim(line);
-        if (line.empty()) continue;
-        if (line.rfind("//", 0) == 0) continue; // ignore comments
+        const std::vector<std::string> fields = splitTabFields(line);
 
-        if (line.rfind("SUBJ:", 0) == 0) {
-            // Finish previous slot & subject
-            if (inSlot) { currSubj.slots.push_back(currSlot); inSlot = false; }
-            if (!currSubj.subject_code.empty()) subjects.push_back(currSubj);
+        // SUBJECT CODE, SUBJECT, UNITS, SECTION, DAY - TIME, ROOM,
+        // INSTRUCTOR, OPEN SLOTS.  Headers and incomplete rows are ignored.
+        if (fields.size() != 8 || fields[0].empty() || fields[3].empty()) continue;
+        //if (isClosedRow(fields)) continue;
 
-            currSubj = subject();
-            currSubj.subject_code = line.substr(5);
-            trim(currSubj.subject_code);
-        }
-        else if (line.rfind("PROF:", 0) == 0) {
-            if (inSlot) { currSubj.slots.push_back(currSlot); inSlot = false; }
+        schedule parsed{};
+        if (!parseMeeting(fields[4], parsed)) continue;
 
-            currProf = line.substr(5);
-            trim(currProf);
-        }
-        else if (!line.empty() && line.find(' ') == std::string::npos) {
-            // Section (assume no spaces in section name)
-            if (inSlot) currSubj.slots.push_back(currSlot);
-
-            currSlot = slot();
-            currSlot.subject_code = currSubj.subject_code;
-            currSlot.professor = currProf;
-            currSlot.section = line;
-            inSlot = true;
-        }
-        else {
-            // Schedule line: days start end [room]
-            if (!inSlot) continue;
-
-            std::istringstream ss(line);
-            std::string days, startStr, endStr, room = "IGN";
-            ss >> days >> startStr >> endStr;
-            if (ss >> room); // optional room
-
-            schedule s;
-            s.subject_code = currSubj.subject_code;
-            s.professor   = currProf;
-            s.section     = currSlot.section;
-            s.days        = days;
-            s.room        = room;
-
-            parseTime(startStr, s.start_hour, s.start_min);
-            parseTime(endStr,   s.end_hour,   s.end_min);
-
-            currSlot.schedules.push_back(s);
-        }
+        parsed.subject_code = fields[0];
+        parsed.section = fields[3];
+        parsed.room = fields[5];
+        parsed.professor = fields[6];
+        addTabularSchedule(subjects, parsed.subject_code, parsed.section, parsed);
     }
-
-    // Push last slot & subject
-    if (inSlot) currSubj.slots.push_back(currSlot);
-    if (!currSubj.subject_code.empty()) subjects.push_back(currSubj);
 }
 
 
