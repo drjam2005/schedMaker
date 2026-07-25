@@ -119,7 +119,7 @@ Renderer::Renderer() {
     // Day mappings
     umap["M"]   = {0}; umap["T"] = {1}; umap["W"] = {2};
     umap["TH"]  = {3}; umap["FRI"] = {4}; umap["SAT"] = {5}; umap["SUN"] = {6};
-    umap["MW"]  = {0,2}; umap["TTH"] = {1,3};
+    umap["MW"]  = {0,2}; umap["TTH"] = {1,3}; umap["FSA"] = {4,5};
 
     days = {"M","T","W","TH","FRI","SAT","SUN"};
 

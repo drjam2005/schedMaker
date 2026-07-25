@@ -16,6 +16,7 @@ bool schedule::isColliding(const schedule& other) const {
     auto getDays = [](std::string dstr) -> std::vector<std::string> {
         if (dstr == "MW") return {"M", "W"};
         if (dstr == "TTH") return {"T", "TH"};
+        if (dstr == "FSA") return {"FRI", "SAT"};
         return {dstr};
     };
 

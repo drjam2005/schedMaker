@@ -38,7 +38,7 @@ Scheduler::Scheduler(std::string filePath) {
     dayNames = {"M","T","W","TH","FRI","SAT","SUN"};
     dayMap = {
         {"M",{0}}, {"T",{1}}, {"W",{2}}, {"TH",{3}}, {"FRI",{4}}, {"SAT",{5}}, {"SUN",{6}},
-        {"MW",{0,2}}, {"TTH",{1,3}}
+        {"MW",{0,2}}, {"TTH",{1,3}}, {"FSA",{4,5}}
     };
 }
 
@@ -248,6 +248,26 @@ bool Scheduler::violatesConsecutive(const std::vector<schedule>& schedules) {
     return false; // ok
 }
 
+// A generated schedule is only usable when it includes an offering for every
+// subject code parsed from the input file.  Keep this check separate from the
+// placement logic so an empty slot (or a later change to the backtracker)
+// cannot cause a partial schedule to be returned.
+static bool includesEverySubjectCode(const std::vector<subject>& subjects,
+                                     const std::vector<schedule>& schedules) {
+    for (const subject& subj : subjects) {
+        if (subj.subject_code == "GAP") continue;
+
+        const bool isIncluded = std::any_of(
+            schedules.begin(), schedules.end(),
+            [&](const schedule& entry) {
+                return entry.subject_code == subj.subject_code;
+            });
+        if (!isIncluded) return false;
+    }
+
+    return true;
+}
+
 
 bool Scheduler::backtrackSchedule(
     const std::vector<subject>& subs,
@@ -256,8 +276,13 @@ bool Scheduler::backtrackSchedule(
     std::vector<schedule>& result
 ) {
     if(idx >= subs.size()) {  // all subjects placed
-        result = placed;
-        return true;
+        // Do not return a partial schedule: each subject code from scheds.txt
+        // must occur in the generated result at least once.
+        if (includesEverySubjectCode(subs, placed)) {
+            result = placed;
+            return true;
+        }
+        return false;
     }
 
     const subject &currSubj = subs[idx];
