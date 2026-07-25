@@ -46,11 +46,11 @@ void Renderer::SyncGapsToScheduler(Scheduler& scheduler) {
 Color Renderer::getSubjectColor(const std::string& subj) {
     if(subjectColors.find(subj) != subjectColors.end()) return subjectColors[subj];
 
-    size_t hash = std::hash<std::string>{}(subj+":69");
+    size_t subjHash = std::hash<std::string>{}(subj+":33");
     Color c = {
-        static_cast<unsigned char>((hash & 0xFF0000) >> 16),
-        static_cast<unsigned char>((hash & 0x00FF00) >> 8),
-        static_cast<unsigned char>(hash & 0x0000FF),
+        static_cast<unsigned char>((subjHash & 0xFF0000) >> 16),
+        static_cast<unsigned char>((subjHash & 0x00FF00) >> 8),
+        static_cast<unsigned char>(subjHash & 0x0000FF),
         255
     };
     subjectColors[subj] = c;
